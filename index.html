@@ -221,6 +221,59 @@ canvas{
 }
 
 /* เนื้อหา */
+#trickBox{
+    position:fixed;
+
+    bottom:10px;
+    right:10px;
+
+    width:140px;
+    max-width:35%;
+
+    background:rgba(10,14,35,.8);
+    border:1px solid #26306a;
+    border-radius:12px;
+    padding:8px;
+
+    font-size:10px;
+    color:#f2f5ff;
+    line-height:1.4;
+
+    backdrop-filter:blur(6px);
+
+    z-index:600;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.4);
+
+    /* 🔥 กันพลาด click */
+    pointer-events:auto;
+}
+
+/* 🔥 หัวข้อ (ปุ่ม + กระพริบ) */
+.t-title{
+    font-weight:700;
+    color:#7cffc4;
+    font-size:11px;
+    text-align:center;
+    cursor:pointer;
+
+    margin-bottom:4px;
+
+    background:rgba(124,255,196,.1);
+    padding:6px;
+    border-radius:8px;
+    transition:.2s;
+
+    animation:blinkHint 1.2s infinite;
+}
+
+/* 🔥 ตอนกด */
+.t-title:active{
+    transform:scale(.95);
+    background:rgba(124,255,196,.25);
+}
+
+/* เนื้อหา */
 #trickText{
     line-height:1.4;
 }
@@ -246,6 +299,10 @@ canvas{
     50%{opacity:.6}
 }
 
+/* ✅ ใช้ระบบเดียว (สำคัญมาก) */
+.hidden{
+    display:none !important;
+}
 
 
 </style>
@@ -303,7 +360,7 @@ TRICK
     <div class="t-title" onclick="toggleTrickContent()">
         📖 ปุ่มดูทริค ▾
     </div>
-    <div id="trickText" style="display:none;">
+   <div id="trickText" class="hidden">
         <!-- เนื้อหาทริคของคุณ -->
     </div>
 </div>
@@ -392,12 +449,20 @@ async function login(){
 
     if(data.status==="ok"){
 
-      loginBoxEl.style.display="none";
-      appEl.style.display="grid"; // 🔥 ของคุณใช้ grid
+loginBoxEl.style.display = "none";
+appEl.style.display = "grid";
 
-      /* 🔒 ตรวจ License ทุก 30 วิ */
-      const user = userInput.value;
-      const pass = passInput.value;
+trickUnlocked = true;
+trickAutoMode = true;
+
+// 🔥 เปิดทริคให้แน่นอนหลัง render
+requestAnimationFrame(() => {
+    openTrickAuto();
+});
+
+/* 🔒 ตรวจ License ทุก 30 วิ */
+const user = userInput.value;
+const pass = passInput.value;
 
       setInterval(async ()=>{
 
@@ -486,28 +551,22 @@ function add(v){
         }
     }
 
-    // ===== LOG 18 =====
-   if(predictionStack.length){
+    if(predictionStack.length){
+        const bet = predictionStack.shift();
+        let correct = (v === bet);
 
-    const bet = predictionStack.shift(); // ดึงตัวแรก
+        log18.unshift({
+            bet,
+            actual: v,
+            ok: correct
+        });
 
-    let correct = (v === bet);
-
-    log18.unshift({
-        bet: bet,
-        actual: v,
-        ok: correct
-    });
-
-    if(log18.length > 18) log18.pop();
-}
-
+        if(log18.length > 18) log18.pop();
+    }
 
     redraw();
     render18();
-    updateTrick(); // ⭐ เพิ่ม
 }
-
 
 
 function updateTrick(){
@@ -703,8 +762,11 @@ function redraw(){
 const historyEl = document.getElementById("history");
 
 /* ===== ADD NEW VARIABLES (วางตรงนี้) ===== */
+let trickUnlocked = true;
+let trickAutoMode = true;
+let trickManuallyClosed = false;
+
 let log18 = [];
-// ✅ ใช้อันนี้แทน
 let predictionStack = [];
 let inputBuffer = "";
 let trioStep = 0;
@@ -822,35 +884,57 @@ function calculateThree(){
         `เงื่อนไข:<br>`+
         `${odd?'คี่':'คู่'} → แทง ${odd?'แทงสวน':'แทงตาม'} ${last4} → `+
         `<span class="blink ${bet}">${bet}</span>`;
+
+          // 🔥 เรียก auto logic หลังปลดล็อก
+    enableAutoTrick();
+
+
+}
+
+
+function openTrickAuto(){
+    const el = document.getElementById("trickText");
+    const title = document.querySelector("#trickBox .t-title");
+
+    if(!el || !title) return;
+
+    el.classList.remove("hidden");
+    el.style.display = "block";
+    title.innerHTML = "📖 ปิดทริค ▲";
 }
 
 window.onload = () => {
-    threeResult = document.getElementById("threeResult");
-    prediction = document.getElementById("prediction");
-
     redraw();
     render18();
     updateTrick();
+
+    setTimeout(() => {
+        openTrickAuto();
+    }, 100);
 };
 
 let trickUsed = false;
 
 function toggleTrickContent(){
+
     const el = document.getElementById("trickText");
     const title = document.querySelector("#trickBox .t-title");
 
-    if(el.style.display === "none"){
+    const isHidden = el.classList.contains("hidden");
+
+    if(isHidden){
+        el.classList.remove("hidden");
         el.style.display = "block";
         title.innerHTML = "📖 ปิดทริค ▲";
 
-        if(!trickUsed){
-            title.style.animation = "none"; // หยุดกระพริบ
-            trickUsed = true;
-        }
+        trickManuallyClosed = false;
 
-    }else{
+    } else {
+        el.classList.add("hidden");
         el.style.display = "none";
         title.innerHTML = "📖 ปุ่มดูทริค ▾";
+
+        trickManuallyClosed = true;
     }
 }
 

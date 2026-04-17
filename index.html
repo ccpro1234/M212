@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baccarat Colorful</title>
+
+<style>
+:root{
+    --bg:#0b1020;
+    --card:#141a33;
+    --border:#26306a;
+    --p:#3fa9ff;
+    --b:#ff5fa2;
+    --accent:#7cffc4;
+    --text:#f2f5ff;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Segoe UI, Arial, sans-serif;
+    background:
+      radial-gradient(circle at top, #1d2b6d, transparent 45%),
+      radial-gradient(circle at bottom, #4a124f, transparent 45%),
+      var(--bg);
+    color:var(--text);
+    padding:10px;
+}
+
+/* วันหมดอายุ */
+.expiry{
+    position:fixed;
+    top:8px;
+    right:12px;
+    font-size:11px;
+    color:#ffb4b4;
+    opacity:.85;
+    z-index:1000;
+}
+
+/* LOGIN */
+#login{
+    position:fixed;
+    inset:0;
+    background:#050812;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+#login .box{
+    background:#0f1430;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    width:260px;
+    text-align:center;
+}
+#login input{
+    width:100%;
+    margin:6px 0;
+    padding:8px;
+}
+#login button{
+    width:100%;
+    margin-top:10px;
+    background:linear-gradient(180deg,#2a3570,#1a2350);
+}
+#login .err{color:#ff6b6b;font-size:12px;margin-top:6px}
+
+/* APP */
+.app{max-width:900px;margin:auto;display:grid;gap:10px}
+.card{
+    background:linear-gradient(180deg,var(--card),#0f1430);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    box-shadow:0 8px 25px rgba(0,0,0,.45);
+}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{
+    border:none;border-radius:10px;padding:8px 14px;
+    font-size:13px;cursor:pointer;color:white
+}
+button:active{transform:scale(.96)}
+.btn-p{background:linear-gradient(180deg,#67c3ff,var(--p))}
+.btn-b{background:linear-gradient(180deg,#ff87c1,var(--b))}
+.btn-g{background:linear-gradient(180deg,#2a3570,#1a2350)}
+.stats span{
+    background:#1a2150;border:1px solid var(--border);
+    padding:6px 10px;border-radius:10px;
+    font-size:12px;color:var(--accent)
+}
+input{
+    width:65px;padding:6px;border-radius:8px;
+    border:1px solid var(--border);
+    background:#0d1230;color:white;text-align:center
+}
+.keypad{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:6px
+}
+.keypad button{
+    background:linear-gradient(180deg,#263080,#161e55);
+    font-size:16px;padding:10px
+}
+.result{
+    font-size:14px;
+    font-weight:bold;
+    color:var(--accent);
+    line-height:1.6;
+}
+
+/* BLINK */
+@keyframes blinkStrong{
+    0%{transform:scale(1);box-shadow:0 0 10px currentColor}
+    50%{transform:scale(1.35);box-shadow:0 0 35px currentColor}
+    100%{transform:scale(1);box-shadow:0 0 10px currentColor}
+}
+.blink{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:12px;
+    font-size:22px;
+    font-weight:900;
+    animation:blinkStrong .9s infinite;
+}
+.blink.P{color:var(--p);background:rgba(63,169,255,.15)}
+.blink.B{color:var(--b);background:rgba(255,95,162,.15)}
+
+canvas{
+    width:100%;background:#0b1030;
+    border-radius:12px;border:1px solid var(--border)
+}
+.history{
+    font-family:Consolas, monospace;
+    font-size:12px;color:#e0e4ff
+}
+
+/* หมดอายุ */
+#expired{
+    position:fixed;
+    inset:0;
+    background:#050812;
+    color:white;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    z-index:9998;
+}
+#expired h1{color:#ff6b6b}
+
+#resultGrid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:6px;
+}
+
+.cell{
+    background:#0d1230;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:6px;
+    font-size:12px;
+    text-align:center;
+}
+
+.ok{color:#7cffc4}
+.no{color:#ff6b6b}
+
+#trickBox{
+    position:fixed;
+
+    bottom:10px;
+    right:10px;
+    top:auto;
+
+    width:170px;
+    max-width:40%;
+
+    background:rgba(10,14,35,.8);
+    border:1px solid #26306a;
+    border-radius:12px;
+    padding:10px;
+
+    font-size:11px;
+    color:#f2f5ff;
+    line-height:1.4;
+
+    backdrop-filter:blur(6px);
+
+    z-index:600;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.4);
+}
+
+.t-title{
+    font-weight:700;
+    margin-bottom:6px;
+    color:#7cffc4;
+}
+
+#trickText{
+    line-height:1.4;
+}
+
+@media (max-width:600px){
+    #trickBox{
+        width:130px;
+        padding:8px;
+        font-size:10px;
+        opacity:.9;
+    }
+    .t-title{
+        font-size:10px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="expiry">หมดอายุ 19 เมษายน พ.ศ. 2569</div>
+
+<button onclick="toggleTrick()" style="
+position:fixed;
+bottom:10px;
+left:10px;
+z-index:600;
+background:#1a2350;
+border-radius:10px;
+padding:6px 10px;
+font-size:11px;
+color:white;
+border:none;
+">
+TRICK
+</button>
+
+
+<!-- LOGIN -->
+<div id="login">
+    <div class="box">
+        <h3>เข้าสู่ระบบ</h3>
+
+        <input id="u" placeholder="User">
+
+        <!-- 🔥 password + toggle อยู่ด้วยกัน -->
+        <input id="p" type="password" placeholder="Password">
+
+        <label style="font-size:12px;display:block;margin-top:4px;">
+            <input type="checkbox" onclick="togglePassword()"> แสดงรหัสผ่าน
+        </label>
+
+        <button onclick="login()">LOG IN</button>
+
+        <div class="err" id="err"></div>
+    </div>
+</div>
+
+<!-- EXPIRED -->
+<div id="expired">
+    <div>
+        <h1>โปรแกรมหมดอายุ</h1>
+        <p>หมดอายุวันที่ 19 เมษายน พ.ศ. 2569</p>
+    </div>
+</div>
+
+<div id="trickBox">
+    <div class="t-title">TRICK MODE</div>
+    <div id="trickText">-</div>
+</div>
+
+<div class="app" id="app" style="display:none">
+
+<div class="card row">
+    <button class="btn-p" onclick="add('P')">PLAYER</button>
+    <button class="btn-b" onclick="add('B')">BANKER</button>
+    <button class="btn-g" onclick="undo()">UNDO</button>
+    <button class="btn-g" onclick="clearGrid()">CLEAR</button>
+</div>
+
+<div class="card stats row">
+    <span id="pCnt">P = 0</span>
+    <span id="bCnt">B = 0</span>
+    <span id="sumCnt">รวม = 0</span>
+</div>
+
+<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+    <label style="font-size:11px">โปร่ง</label>
+    <input id="openInput" onfocus="setActive(this)" placeholder="Open">
+
+    <label style="font-size:11px">ทึบ</label>
+    <input id="closeInput" onfocus="setActive(this)" placeholder="Close">
+
+    <label style="font-size:11px">ขีด</label>
+    <input id="slashInput" onfocus="setActive(this)" placeholder="Slash">
+
+    <button class="btn-g" onclick="calculateThree()">คำนวณ</button>
+    <button class="btn-g" onclick="clearThree()">เคลียร์ค่า</button>
+</div>
+
+<div class="card keypad">
+    <button onclick="keypad('7')">7</button><button onclick="keypad('8')">8</button><button onclick="keypad('9')">9</button>
+    <button onclick="keypad('4')">4</button><button onclick="keypad('5')">5</button><button onclick="keypad('6')">6</button>
+    <button onclick="keypad('1')">1</button><button onclick="keypad('2')">2</button><button onclick="keypad('3')">3</button>
+    <button onclick="keypad('0')">0</button><button onclick="keypad('⌫')">⌫</button><button onclick="keypad('C')">C</button>
+</div>
+
+<div class="card result" id="threeResult">สามเกลอ: -</div>
+
+<div class="card">
+    <div class="row" id="resultGrid"></div>
+    <div class="result" id="accuracy">Accuracy % ต่ำกว่า 50 % ควรเล่นสวน : -</div>
+</div>
+
+<div class="card result" id="prediction">เงื่อนไข: -</div>
+
+<div class="card">
+    <canvas id="road" width="900" height="160"></canvas>
+</div>
+
+<div class="card history" id="history"></div>
+</div>
+
+<script>
+/* ===== LOGIN (iOS FIX ONLY) ===== */
+const u = document.getElementById("u");
+const p = document.getElementById("p");
+const app = document.getElementById("app");
+const err = document.getElementById("err");
+const loginBox = document.getElementById("login");
+const expired = document.getElementById("expired");
+
+async function login(){
+
+  const userInput = document.getElementById("u");
+  const passInput = document.getElementById("p");
+
+  const loginBoxEl = document.getElementById("login");
+  const appEl = document.getElementById("app");
+  const loginErrEl = document.getElementById("err");
+
+  loginErrEl.textContent="กำลังตรวจสอบ...";
+
+  try{
+
+    const res = await fetch(
+      "https://morning-block-55bb.havanalanna.workers.dev/?user="
+      + encodeURIComponent(userInput.value)
+      + "&pass=" + encodeURIComponent(passInput.value)
+    );
+
+    const data = await res.json();
+
+    if(data.status==="ok"){
+
+      loginBoxEl.style.display="none";
+      appEl.style.display="grid"; // 🔥 ของคุณใช้ grid
+
+      /* 🔒 ตรวจ License ทุก 30 วิ */
+      const user = userInput.value;
+      const pass = passInput.value;
+
+      setInterval(async ()=>{
+
+        try{
+
+          const r = await fetch(
+            "https://morning-block-55bb.havanalanna.workers.dev/?user="
+            + encodeURIComponent(user)
+            + "&pass=" + encodeURIComponent(pass)
+          );
+
+          const j = await r.json();
+
+          if(j.status!=="ok"){
+            alert("⛔ License ถูกปิดใช้งาน");
+            location.reload();
+          }
+
+        }catch(e){
+          console.log("License check error");
+        }
+
+      },30000);
+
+    }else{
+      loginErrEl.textContent="User หรือ Password ไม่ถูกต้อง";
+    }
+
+  }catch(e){
+    loginErrEl.textContent="ไม่สามารถเชื่อมต่อ License Server";
+  }
+}
+
+
+function togglePassword(){
+    const passInput = document.getElementById("p");
+
+    passInput.type =
+        passInput.type === "password"
+        ? "text"
+        : "password";
+}
+
+
+/* EXPIRE */
+(function(){
+    const expire=new Date("2026-04-19T00:00:00");
+    if(new Date()>=expire){
+        expired.style.display="flex";
+        loginBox.style.display="none";
+        app.style.display="none";
+    }
+})();
+</script>
+
+<script>
+/* === ส่วน logic เดิมทั้งหมด ไม่เปลี่ยน === */
+const ROWS=6, CELL=24;
+let history=[], columns=[], activeInput=null;
+
+const canvas=document.getElementById("road");
+const ctx=canvas.getContext("2d");
+
+
+const threeResult = document.getElementById("threeResult");
+const prediction = document.getElementById("prediction");
+
+
+const openEl = document.getElementById("openInput");
+const closeEl = document.getElementById("closeInput");
+const slashEl = document.getElementById("slashInput");
+
+function add(v){
+    history.push(v);
+
+    if(columns.length===0) columns.push([v]);
+    else{
+        const col = columns[columns.length-1];
+        const last = col[col.length-1];
+
+        if(v===last){
+            if(col.length<ROWS) col.push(v);
+            else columns.push([v]);
+        }else{
+            columns.push([v]);
+        }
+    }
+
+    // ===== LOG 18 =====
+   if(predictionStack.length){
+
+    const bet = predictionStack.shift(); // ดึงตัวแรก
+
+    let correct = (v === bet);
+
+    log18.unshift({
+        bet: bet,
+        actual: v,
+        ok: correct
+    });
+
+    if(log18.length > 18) log18.pop();
+}
+
+
+    redraw();
+    render18();
+    updateTrick(); // ⭐ เพิ่ม
+}
+
+
+
+function updateTrick(){
+    const el = document.getElementById("trickText");
+    if(!el) return;
+
+    el.innerHTML = `
+<b>วิธีการเล่น อ่านให้เข้าใจ</b><br><br>
+
+<b>1)</b> นับ 3 เกลอ คอลั่มท้ายสุด ให้นับทั้งแถว แล้วเอาจำนวนที่นับสามเกลอมาบวก รวมกัน<br>
+ได้ผลเป็น → <b>คู่ / คี่</b><br><br>
+
+<b>2) ถ้าได้ “คี่”</b><br>
+- นับเค้าไพ่หลักย้อนหลัง 4 ตา<br>
+- ถ้าเป็น <b>แดง</b> → แทง <b>น้ำเงิน</b><br>
+- ถ้าเป็น <b>น้ำเงิน</b> → แทง <b>แดง</b><br>
+→ สรุป: <b>แทงสวน</b><br><br>
+
+<b>3) ถ้าเป็น “คู่”</b><br>
+- นับเค้าไพ่หลักย้อนหลัง 4 ตา<br>
+- ถ้าเป็น <b>เงิน</b> → แทง <b>เงิน</b><br>
+- ถ้าเป็น <b>แดง</b> → แทง <b>แดง</b><br>
+→ สรุป: <b>แทงตาม</b><br>
+`;
+}
+
+
+function render18(){
+    const grid=document.getElementById("resultGrid");
+    const acc=document.getElementById("accuracy");
+
+    grid.innerHTML="";
+
+    let correct=0;
+
+    log18.forEach(item=>{
+        if(item.ok) correct++;
+
+        const div=document.createElement("div");
+        div.className="cell";
+
+        div.innerHTML=`
+            <div>${item.bet}</div>
+            <div>${item.actual}</div>
+            <div class="${item.ok?'ok':'no'}">
+                ${item.ok?'✔':'✖'}
+            </div>
+        `;
+
+        grid.appendChild(div);
+    });
+
+    let percent = log18.length
+        ? ((correct/log18.length)*100).toFixed(1)
+        : 0;
+
+    acc.innerText=`Accuracy: ${percent}% (${correct}/${log18.length})`;
+}
+
+
+function undo(){
+
+    if(history.length){
+        history.pop();
+    }
+
+    if(log18.length){
+        log18.shift();
+    }
+
+    // 🔥 ย้อนค่าที่เคยทำนาย (สำคัญมาก)
+    if(predictionStack.length){
+        predictionStack.pop();
+    }
+
+    if(trioStack.length){
+        trioData = trioStack.pop();
+    }
+
+    openEl.value  = trioData[0];
+    closeEl.value = trioData[1];
+    slashEl.value = trioData[2];
+
+    trioStep =
+        trioData[0] === "" ? 0 :
+        trioData[1] === "" ? 1 :
+        trioData[2] === "" ? 2 : 0;
+
+    // 🔥 reset แสดงผล
+    lastPrediction = null;
+    prediction.innerText = "เงื่อนไข: -";
+
+    rebuild();
+    render18();
+    redraw();
+}
+
+
+
+function clearGrid(){
+
+    history = [];
+    columns = [];
+
+    log18 = [];
+
+    // 🔥 สำคัญมาก (ล้างตัวแทงค้าง)
+    predictionStack = [];
+
+    // (กันกรณีคุณยังใช้ตัวนี้อยู่)
+    lastPrediction = null;
+
+    inputBuffer = "";
+
+    // 🔥 ล้างสามเกลอ
+    trioData = ["", "", ""];
+    trioStack = [];
+    trioStep = 0;
+
+    openEl.value = "";
+    closeEl.value = "";
+    slashEl.value = "";
+
+    threeResult.innerText = "สามเกลอ: -";
+    prediction.innerText = "เงื่อนไข: -";
+
+    redraw();
+    render18();
+    updateTrick();
+}
+
+
+
+function rebuild(){
+    columns = [];
+
+    for(let i=0;i<history.length;i++){
+        const v = history[i];
+
+        if(columns.length===0){
+            columns.push([v]);
+        }else{
+            const col = columns[columns.length-1];
+            const last = col[col.length-1];
+
+            if(v === last){
+                if(col.length < ROWS){
+                    col.push(v);
+                }else{
+                    columns.push([v]);
+                }
+            }else{
+                columns.push([v]);
+            }
+        }
+    }
+}
+
+
+function redraw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    const maxCols = Math.floor(canvas.width / CELL);
+    const start = Math.max(0, columns.length - maxCols);
+
+    for(let c=start;c<columns.length;c++){
+        const dc = c - start;
+        const col = columns[c];
+
+        for(let r=0;r<col.length;r++){
+            ctx.strokeStyle = col[r]==='B' ? '#ff5fa2' : '#3fa9ff';
+
+            ctx.beginPath();
+            ctx.arc(
+                dc*CELL + CELL/2,
+                r*CELL + CELL/2,
+                CELL/2 - 4,
+                0,
+                Math.PI*2
+            );
+            ctx.stroke();
+        }
+    }
+
+    pCnt.innerText = "P = " + history.filter(x=>x==='P').length;
+    bCnt.innerText = "B = " + history.filter(x=>x==='B').length;
+    sumCnt.innerText = "รวม = " + history.length;
+
+    historyEl.innerText = history.join(" ");
+}
+
+
+const historyEl = document.getElementById("history");
+
+/* ===== ADD NEW VARIABLES (วางตรงนี้) ===== */
+let log18 = [];
+// ✅ ใช้อันนี้แทน
+let predictionStack = [];
+let inputBuffer = "";
+let trioStep = 0;
+let inputTimer = null;
+let trioData = ["", "", ""];
+let trioStack = [];
+
+function setActive(e){activeInput=e}
+
+function pushToField(val){
+
+    trioStack.push([...trioData]);
+
+    trioData[trioStep] = val;
+
+    openEl.value  = trioData[0];
+    closeEl.value = trioData[1];
+    slashEl.value = trioData[2];
+
+    trioStep = (trioStep + 1) % 3;
+}
+
+function commitBuffer(){
+    if(!inputBuffer) return;
+
+    pushToField(inputBuffer);
+
+    inputBuffer = "";
+}
+
+
+
+// ✅ วางฟังก์ชัน X ตรงนี้ (หลัง pushToField)
+function deleteOneField(){
+
+    if(trioStep === 0) trioStep = 2;
+    else trioStep--;
+
+    trioData[trioStep] = "";
+
+    trioStack.push([...trioData]); // สำคัญมาก
+
+    openEl.value  = trioData[0];
+    closeEl.value = trioData[1];
+    slashEl.value = trioData[2];
+}
+
+function keypad(k){
+
+    if(k === 'C'){
+        clearThree();
+        inputBuffer = "";
+        return;
+    }
+
+    if(k === '⌫'){
+        deleteOneField();
+        inputBuffer = "";
+        return;
+    }
+
+    inputBuffer += k;
+
+    if(inputBuffer.length > 2){
+        inputBuffer = inputBuffer.slice(0,2);
+    }
+
+    clearTimeout(inputTimer);
+
+    inputTimer = setTimeout(() => {
+        commitBuffer();
+    }, 450);
+}
+
+
+function clearThree(){
+
+    trioData = ["", "", ""];
+    trioStack = [];
+    trioStep = 0;
+
+    openEl.value = "";
+    closeEl.value = "";
+    slashEl.value = "";
+
+    threeResult.innerText = "สามเกลอ: -";
+    prediction.innerText = "เงื่อนไข: -";
+}
+
+
+function calculateThree(){
+    let o=+openEl.value||0,
+        c=+closeEl.value||0,
+        s=+slashEl.value||0;
+
+    let t=o+c+s;
+
+    threeResult.innerText=`สามเกลอ = ${o} + ${c} + ${s} = ${t}`;
+
+    if(history.length<4){
+        prediction.innerText="ต้องมีเค้าหลักอย่างน้อย 4 ตา";
+        return;
+    }
+
+    let last4=history[history.length-4];
+    let odd=t%2===1;
+
+    // 🎯 ตัวแทง
+    let bet=odd ? (last4==='P'?'B':'P') : last4;
+
+    // 🔥 เก็บค่าเพื่อไปใช้เช็คผลจริงภายหลัง
+    predictionStack.push(bet);
+
+    prediction.innerHTML =
+        `เงื่อนไข:<br>`+
+        `${odd?'คี่':'คู่'} → แทง ${odd?'แทงสวน':'แทงตาม'} ${last4} → `+
+        `<span class="blink ${bet}">${bet}</span>`;
+}
+
+window.onload = () => {
+    threeResult = document.getElementById("threeResult");
+    prediction = document.getElementById("prediction");
+
+    redraw();
+    render18();
+    updateTrick();
+};
+
+
+function toggleTrick(){
+    const box = document.getElementById("trickBox");
+
+    box.style.display =
+        box.style.display === "none" ? "block" : "none";
+}
+
+
+</script>
+
+</body>
+</html>

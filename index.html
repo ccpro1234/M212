@@ -168,22 +168,23 @@ canvas{
 .ok{color:#7cffc4}
 .no{color:#ff6b6b}
 
+
+
 #trickBox{
     position:fixed;
 
     bottom:10px;
     right:10px;
-    top:auto;
 
-    width:170px;
-    max-width:40%;
+    width:140px;
+    max-width:35%;
 
     background:rgba(10,14,35,.8);
     border:1px solid #26306a;
     border-radius:12px;
-    padding:10px;
+    padding:8px;
 
-    font-size:11px;
+    font-size:10px;
     color:#f2f5ff;
     line-height:1.4;
 
@@ -194,27 +195,58 @@ canvas{
     box-shadow:0 8px 20px rgba(0,0,0,.4);
 }
 
+/* 🔥 หัวข้อ (ปุ่ม + กระพริบ) */
 .t-title{
     font-weight:700;
-    margin-bottom:6px;
     color:#7cffc4;
+    font-size:11px;
+    text-align:center;
+    cursor:pointer;
+
+    margin-bottom:4px;
+
+    background:rgba(124,255,196,.1);
+    padding:6px;
+    border-radius:8px;
+    transition:.2s;
+
+    /* 🔥 เพิ่ม animation */
+    animation:blinkHint 1.2s infinite;
 }
 
+/* 🔥 ตอนกด */
+.t-title:active{
+    transform:scale(.95);
+    background:rgba(124,255,196,.25);
+}
+
+/* เนื้อหา */
 #trickText{
     line-height:1.4;
 }
 
+/* 📱 มือถือ */
 @media (max-width:600px){
+
     #trickBox{
-        width:130px;
-        padding:8px;
-        font-size:10px;
+        width:120px;
+        padding:6px;
+        font-size:9px;
         opacity:.9;
     }
+
     .t-title{
         font-size:10px;
     }
 }
+
+/* 🔥 animation */
+@keyframes blinkHint{
+    0%,100%{opacity:1}
+    50%{opacity:.6}
+}
+
+
 
 </style>
 </head>
@@ -268,8 +300,12 @@ TRICK
 </div>
 
 <div id="trickBox">
-    <div class="t-title">TRICK MODE</div>
-    <div id="trickText">-</div>
+    <div class="t-title" onclick="toggleTrickContent()">
+        📖 ปุ่มดูทริค ▾
+    </div>
+    <div id="trickText" style="display:none;">
+        <!-- เนื้อหาทริคของคุณ -->
+    </div>
 </div>
 
 <div class="app" id="app" style="display:none">
@@ -797,12 +833,25 @@ window.onload = () => {
     updateTrick();
 };
 
+let trickUsed = false;
 
-function toggleTrick(){
-    const box = document.getElementById("trickBox");
+function toggleTrickContent(){
+    const el = document.getElementById("trickText");
+    const title = document.querySelector("#trickBox .t-title");
 
-    box.style.display =
-        box.style.display === "none" ? "block" : "none";
+    if(el.style.display === "none"){
+        el.style.display = "block";
+        title.innerHTML = "📖 ปิดทริค ▲";
+
+        if(!trickUsed){
+            title.style.animation = "none"; // หยุดกระพริบ
+            trickUsed = true;
+        }
+
+    }else{
+        el.style.display = "none";
+        title.innerHTML = "📖 ปุ่มดูทริค ▾";
+    }
 }
 
 

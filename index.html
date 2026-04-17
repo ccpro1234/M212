@@ -304,7 +304,11 @@ canvas{
     display:none !important;
 }
 
+.card.row{
+    border-bottom:1px solid rgba(124,255,196,.15);
+}
 
+    
 </style>
 </head>
 
@@ -367,14 +371,52 @@ TRICK
 
 <div class="app" id="app" style="display:none">
 
-<div class="card row">
-    <button class="btn-p" onclick="add('P')">PLAYER</button>
-    <button class="btn-b" onclick="add('B')">BANKER</button>
-    <button class="btn-g" onclick="undo()">UNDO</button>
-    <button class="btn-g" onclick="clearGrid()">CLEAR</button>
-</div>
 
-<div class="card stats row">
+    <!-- 🔥 HEADER แบบเดิม (อยู่ใน app) -->
+    <div class="card row" style="justify-content:space-between; align-items:center;">
+
+        <!-- ปุ่ม -->
+        <div style="display:flex; gap:8px;">
+            <button class="btn-p" onclick="add('P')">PLAYER</button>
+            <button class="btn-b" onclick="add('B')">BANKER</button>
+            <button class="btn-g" onclick="undo()">UNDO</button>
+            <button class="btn-g" onclick="clearGrid()">CLEAR</button>
+        </div>
+
+        <!-- 🔥 ชื่อโปร + badge -->
+        <div style="flex:1; text-align:center;">
+
+            <div style="
+                font-weight:900;
+                font-size:16px;
+                color:#7cffc4;
+                text-shadow:0 0 10px rgba(124,255,196,.5);
+            ">
+                Baccarat Colorful
+            </div>
+
+            <!-- 🔥 © อ.Maxma -->
+            <div style="margin-top:3px;">
+                <span style="
+                    background:linear-gradient(90deg,#7cffc4,#3fa9ff);
+                    padding:3px 10px;
+                    border-radius:20px;
+                    font-size:10px;
+                    color:#001;
+                    font-weight:700;
+                    box-shadow:0 0 10px rgba(124,255,196,.4);
+                ">
+                    © อ.Maxma
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 🔥 เนื้อหาอื่น -->
+    <div class="card stats row">
+        
     <span id="pCnt">P = 0</span>
     <span id="bCnt">B = 0</span>
     <span id="sumCnt">รวม = 0</span>
